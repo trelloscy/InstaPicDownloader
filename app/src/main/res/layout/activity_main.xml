@@ -58,7 +58,7 @@
         android:id="@+id/txtUsername"
         android:layout_width="220dp"
         android:layout_height="42dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="73dp"
         android:ems="10"
         android:hint="Instagram Username..."

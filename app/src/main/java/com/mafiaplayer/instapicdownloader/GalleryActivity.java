@@ -15,6 +15,8 @@ import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import static android.os.Environment.getExternalStoragePublicDirectory;
 
@@ -92,6 +94,14 @@ public class GalleryActivity extends AppCompatActivity {
         File f = new File(path, appName);
         f.mkdirs(); // SOS: Make sure dir exists!
         File file[] = f.listFiles();
+
+        // New - sort files by date
+        Arrays.sort(file, new Comparator<File>() {
+            public int compare(File f1, File f2) {
+                return Long.valueOf(f2.lastModified()).compareTo(f1.lastModified());
+            }
+        });
+
         ArrayList<CreateList> imageList = new ArrayList<>();
         for (int i=0; i < file.length; i++)
         {
