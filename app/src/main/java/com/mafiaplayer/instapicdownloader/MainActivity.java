@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -31,9 +32,7 @@ import java.net.HttpURLConnection;
 import android.app.ProgressDialog;
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,11 +48,13 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      EditText txtUsername;
      String profilePicUrl = "";
      ArrayList<String> picturesUrlList = new ArrayList<>();
+     Button btnSearch;
      Button btnDownloadProfilePic;
      Button btnDownloadImages;
      Button btnOpenGallery;
+     Button btnRandomAccount;
 
-     public void downloadSourceCode_Click(View v) {
+     public void search_Click(View v) {
 
          // Check for empty username
          String strUserName = txtUsername.getText().toString().trim();
@@ -137,15 +138,28 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          }
      }
 
+     public void getRandomAccount_Click(View v) {
+
+         // Define REST API url
+         String url = "http://centraldbwebapi.azurewebsites.net/api/randomaccount";
+
+         try {
+             new ProcessRestResponseTask().execute(url);
+         } catch (Exception e) {
+             Log.d("Error", e.getMessage());
+         }
+     }
+
      @Override
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_main);
 
-         btn = (Button) findViewById(R.id.btnDownloadSourceCode);
+         btnSearch = (Button) findViewById(R.id.btnSearch);
          txtUsername = (EditText) findViewById(R.id.txtUsername);
          btnDownloadProfilePic = (Button) findViewById(R.id.btnDownloadProfilePic);
          btnDownloadImages = (Button) findViewById(R.id.btnDownloadImages);
+         btnRandomAccount = (Button) findViewById(R.id.btnRandomAccount);
 
          // TEMP - set default value
          //txtUsername.setText("themos.k");
@@ -428,6 +442,86 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  btnDownloadProfilePic.setEnabled(false);
                  btnDownloadImages.setEnabled(false);
              }
+         }
+     }
+
+     /*************************************************************************/
+
+     public class ProcessRestResponseTask extends AsyncTask<String, Void, String> {
+
+         ProgressDialog asyncDialog = new ProgressDialog(MainActivity.this);
+
+         @Override
+         protected void onPreExecute() {
+             // Set message of the dialog
+             asyncDialog.setMessage("Loading random account...");
+             // Show dialog
+             asyncDialog.show();
+         }
+
+         @Override
+         protected String doInBackground(String... urls) {
+
+             URL url;
+             HttpURLConnection urlConnection = null;
+
+             try {
+                 url = new URL(urls[0]);
+                 urlConnection = (HttpURLConnection) url.openConnection();
+                 urlConnection.setRequestMethod("GET");
+                 urlConnection.setRequestProperty("Content-Type", "text/xml");
+
+                 int responseCode = urlConnection.getResponseCode();
+
+                 if(responseCode == HttpURLConnection.HTTP_OK){
+
+                     // HAPPY PATH!
+                     //InputStream responseBody = urlConnection.getInputStream();
+
+                     BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                     StringBuilder sb = new StringBuilder();
+                     String line;
+                     if ((line = br.readLine()) != null) {
+                         sb.append(line);
+                     }
+                     br.close();
+                     return sb.toString();
+                 }
+                 else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                     return "Error: service not found";
+                 }
+
+             } catch (MalformedURLException e) {
+                 e.printStackTrace();
+                 return "Error: Malformed URL Exception";
+             } catch (IOException e) {
+                 e.printStackTrace();
+                 return "Error: Network Exception";
+             }
+
+             return null;
+         }
+
+         @Override
+         protected void onPostExecute(String s) {
+
+             // Hide the dialog
+             asyncDialog.dismiss();
+
+             if (s == null) {
+                 Toast.makeText(getApplicationContext(), "Failed to process request", Toast.LENGTH_LONG).show(); // TOAST!
+                 return;
+             }
+             else if (s.startsWith(("Error:"))) {
+                 Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show(); // TOAST!
+                 return;
+             }
+
+             //Toast.makeText(getApplicationContext(), "Request processed successfully", Toast.LENGTH_LONG).show(); // TOAST!
+
+             // Populate textbox and search programmatically
+             txtUsername.setText(s);
+             btnSearch.performClick();
          }
      }
 
