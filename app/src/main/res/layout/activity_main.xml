@@ -24,10 +24,10 @@
         android:text="Download\nPictures"
         android:visibility="visible"
         android:enabled="false"
-        android:layout_marginRight="35dp"
+        android:layout_marginRight="33dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="371dp" />
+        android:layout_marginTop="368dp" />
 
     <Button
         android:id="@+id/btnSearch"
@@ -58,7 +58,7 @@
         android:id="@+id/txtUsername"
         android:layout_width="210dp"
         android:layout_height="42dp"
-        android:layout_marginLeft="32dp"
+        android:layout_marginLeft="28dp"
         android:layout_marginTop="82dp"
         android:ems="10"
         android:hint="Instagram Username..."
@@ -77,8 +77,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="#F2F2F2"
-        android:layout_marginTop="134dp"
-        app:layout_constraintHorizontal_bias="0.505" />
+        android:layout_marginTop="148dp"
+        app:layout_constraintHorizontal_bias="0.504" />
 
     <Button
         android:id="@+id/btnDownloadProfilePic"
@@ -96,10 +96,10 @@
         android:text="Download\nProfile Picture"
         android:visibility="visible"
         android:enabled="false"
-        android:layout_marginLeft="36dp"
+        android:layout_marginLeft="41dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="371dp" />
+        android:layout_marginTop="368dp" />
 
     <!-- view for AdMob Banner Ad -->
     <com.google.android.gms.ads.AdView

@@ -33,6 +33,7 @@ import android.app.ProgressDialog;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,7 +45,6 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
  public class MainActivity extends AppCompatActivity {
 
      String appName = "InstaPicDownloader";
-     Button btn;
      EditText txtUsername;
      String profilePicUrl = "";
      ArrayList<String> picturesUrlList = new ArrayList<>();
@@ -70,10 +70,17 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
          // Define instagram url
-         String url = "https://www.instagram.com/" + strUserName + "/";
-
+         String instagramUrl = "https://www.instagram.com/" + strUserName + "/";
          try {
-             new DownloadSourceCodeTask().execute(url);
+             new DownloadSourceCodeTask().execute(instagramUrl);
+         } catch (Exception e) {
+             Log.d("Error", e.getMessage());
+         }
+
+         // New
+         String metadataUrl = "http://centraldbwebapi.azurewebsites.net/api/metadata/" + strUserName;
+         try {
+             new ProcessMetadataTask().execute(metadataUrl);
          } catch (Exception e) {
              Log.d("Error", e.getMessage());
          }
@@ -140,6 +147,16 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
      public void getRandomAccount_Click(View v) {
 
+         // METHOD 1
+         String[] array = getApplicationContext().getResources().getStringArray(R.array.accounts_array);
+         String randomStr = array[new Random().nextInt(array.length)];
+
+         txtUsername.setText(randomStr);
+         btnSearch.performClick();
+
+         /*
+          * METHOD 2
+          *
          // Define REST API url
          String url = "http://centraldbwebapi.azurewebsites.net/api/randomaccount";
 
@@ -148,6 +165,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          } catch (Exception e) {
              Log.d("Error", e.getMessage());
          }
+         */
      }
 
      @Override
@@ -170,7 +188,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          // Load an ad into the AdMob banner view.
          AdView adView = (AdView) findViewById(R.id.adView);
          AdRequest adRequest = new AdRequest.Builder()
-                 .addTestDevice("0109EABF5055E4716546558907BEA085") // REMOVE THIS IN PROD!!!!!!!
+                 //.addTestDevice("0109EABF5055E4716546558907BEA085") // REMOVE THIS IN PROD!!!!!!!
                  .build();
          adView.loadAd(adRequest);
 
@@ -446,7 +464,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      }
 
      /*************************************************************************/
-
+    // Source: https://stackoverflow.com/questions/8654876/http-get-using-android-httpurlconnection
      public class ProcessRestResponseTask extends AsyncTask<String, Void, String> {
 
          ProgressDialog asyncDialog = new ProgressDialog(MainActivity.this);
@@ -522,6 +540,45 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              // Populate textbox and search programmatically
              txtUsername.setText(s);
              btnSearch.performClick();
+         }
+     }
+
+     /***************************************************************************/
+
+     public class ProcessMetadataTask extends AsyncTask<String, Void, String> {
+
+         @Override
+         protected String doInBackground(String... urls) {
+
+             URL url;
+             HttpURLConnection urlConnection = null;
+
+             try {
+                 url = new URL(urls[0]);
+                 urlConnection = (HttpURLConnection) url.openConnection();
+                 urlConnection.setRequestMethod("GET");
+                 urlConnection.setRequestProperty("Content-Type", "text/xml");
+
+                 int responseCode = urlConnection.getResponseCode();
+
+                 if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                     // HAPPY PATH!
+                     return "Success";
+
+                 } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                     return "Error: service not found";
+                 }
+
+             } catch (MalformedURLException e) {
+                 e.printStackTrace();
+                 return "Error: Malformed URL Exception";
+             } catch (IOException e) {
+                 e.printStackTrace();
+                 return "Error: Network Exception";
+             }
+
+             return null;
          }
      }
 

@@ -40,7 +40,7 @@ public class GalleryActivity extends AppCompatActivity {
         // Load an ad into the AdMob banner view 2.
         AdView adView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice("0109EABF5055E4716546558907BEA085") // REMOVE THIS IN PROD!!!!!!!
+                //.addTestDevice("0109EABF5055E4716546558907BEA085") // REMOVE THIS IN PROD!!!!!!!
                 .build();
         adView.loadAd(adRequest);
 
