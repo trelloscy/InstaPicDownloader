@@ -45,6 +45,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
  public class MainActivity extends AppCompatActivity {
 
      String appName = "InstaPicDownloader";
+     String instagramUrl = "https://www.instagram.com/";
      EditText txtUsername;
      String profilePicUrl = "";
      ArrayList<String> picturesUrlList = new ArrayList<>();
@@ -57,9 +58,9 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      public void search_Click(View v) {
 
          // Check for empty username
-         String strUserName = txtUsername.getText().toString().trim();
-         if (TextUtils.isEmpty(strUserName)) {
-             txtUsername.setError("Please specify a valid username");
+         String userInput = sanitizeUsername();
+         if (TextUtils.isEmpty(userInput)) {
+             txtUsername.setError("Please specify a valid username or Profile url");
              return;
          }
 
@@ -70,15 +71,17 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 
          // Define instagram url
-         String instagramUrl = "https://www.instagram.com/" + strUserName + "/";
+         String fullUrl = instagramUrl + userInput + "/";
+
          try {
-             new DownloadSourceCodeTask().execute(instagramUrl);
+             new DownloadSourceCodeTask().execute(fullUrl);
          } catch (Exception e) {
              Log.d("Error", e.getMessage());
          }
 
          // New
-         String metadataUrl = "http://centraldbwebapi.azurewebsites.net/api/metadata/" + strUserName;
+         // Problem: This includes INVALID searches
+         String metadataUrl = "http://centraldbwebapi.azurewebsites.net/api/metadata/" + userInput;
          try {
              new ProcessMetadataTask().execute(metadataUrl);
          } catch (Exception e) {
@@ -86,11 +89,22 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          }
      }
 
+     public String sanitizeUsername() {
+         String result = txtUsername.getText().toString().trim();
+
+         result = result.replace(instagramUrl, "");
+         if (result.endsWith("/")) {
+             result = result.substring(0, result.lastIndexOf('/'));
+         }
+
+         return result;
+     }
+
      public void downloadProfilePic_Click(View v) {
 
-         String strUserName = txtUsername.getText().toString().trim();
+         String strUserName = sanitizeUsername();
          if (TextUtils.isEmpty(strUserName)) {
-             txtUsername.setError("Please specify a valid username");
+             txtUsername.setError("Please specify a valid username or Profile url");
              return;
          }
 
@@ -113,9 +127,9 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
      public void downloadImages_Click(View v) {
 
-         String strUserName = txtUsername.getText().toString().trim();
+         String strUserName = sanitizeUsername();
          if (TextUtils.isEmpty(strUserName)) {
-             txtUsername.setError("Please specify a valid username");
+             txtUsername.setError("Please specify a valid username or Profile url");
              return;
          }
 
