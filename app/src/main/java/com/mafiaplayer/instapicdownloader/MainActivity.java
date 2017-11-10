@@ -267,7 +267,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                      // permission denied, boo! Disable the functionality that depends on this permission.
                      btnDownloadProfilePic.setEnabled(false);
                      btnDownloadImages.setEnabled(false);
-                     Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > InstaPic Downloader > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
+                     Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > Pic Downloader for Instagram > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
                  }
                  return;
              }
@@ -668,7 +668,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
              if (s == null) {
                  Toast.makeText(getApplicationContext(), "Image failed to download", Toast.LENGTH_SHORT).show(); // TOAST!
-                 Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > InstaPic Downloader > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
+                 Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > Pic Downloader for Instagram > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
              } else {
                  /*
                  // Doesn't work?
