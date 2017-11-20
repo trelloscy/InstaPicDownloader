@@ -90,7 +90,7 @@ public class GalleryActivity extends AppCompatActivity {
     private ArrayList<CreateList> prepareData(){
 
         String path = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-        String extension = ".jpg";
+        //String extension = ".jpg";
         File f = new File(path, appName);
         f.mkdirs(); // SOS: Make sure dir exists!
         File file[] = f.listFiles();
@@ -105,12 +105,12 @@ public class GalleryActivity extends AppCompatActivity {
         ArrayList<CreateList> imageList = new ArrayList<>();
         for (int i=0; i < file.length; i++)
         {
-            if (file[i].getName().endsWith(extension)) {
+            // (file[i].getName().endsWith(extension)) {
                 CreateList createList = new CreateList();
                 createList.setImage_title(file[i].getName());
                 createList.setImage_Location(file[i].getAbsolutePath());
                 imageList.add(createList);
-            }
+            //}
         }
         return imageList;
     }

@@ -46,6 +46,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
      String appName = "InstaPicDownloader";
      String instagramUrl = "https://www.instagram.com/";
+     String publicDirectoryPrefix = "p/";
      EditText txtUsername;
      String profilePicUrl = "";
      ArrayList<String> picturesUrlList = new ArrayList<>();
@@ -54,13 +55,14 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      Button btnDownloadImages;
      Button btnOpenGallery;
      Button btnRandomAccount;
+     Button btnShareDownload;
 
      public void search_Click(View v) {
 
          // Check for empty username
          String userInput = sanitizeUsername();
          if (TextUtils.isEmpty(userInput)) {
-             txtUsername.setError("Please specify a valid username or Profile url");
+             txtUsername.setError("Please specify a valid Username/Profile url/Share url");
              return;
          }
 
@@ -79,13 +81,16 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              Log.d("Error", e.getMessage());
          }
 
+
          // New
-         // Problem: This includes INVALID searches
-         String metadataUrl = "http://centraldbwebapi.azurewebsites.net/api/metadata/" + userInput;
-         try {
-             new ProcessMetadataTask().execute(metadataUrl);
-         } catch (Exception e) {
-             Log.d("Error", e.getMessage());
+         if (!userInput.startsWith(publicDirectoryPrefix)) {
+             // Problem: This includes INVALID searches
+             String metadataUrl = "http://centraldbwebapi.azurewebsites.net/api/metadata/" + userInput;
+             try {
+                 new ProcessMetadataTask().execute(metadataUrl);
+             } catch (Exception e) {
+                 Log.d("Error", e.getMessage());
+             }
          }
      }
 
@@ -104,7 +109,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
          String strUserName = sanitizeUsername();
          if (TextUtils.isEmpty(strUserName)) {
-             txtUsername.setError("Please specify a valid username or Profile url");
+             txtUsername.setError("Please specify a valid Username/Profile url/Share url");
              return;
          }
 
@@ -115,7 +120,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          // NEW
          String fileName = profilePicUrl.substring(profilePicUrl.lastIndexOf('/')+1, profilePicUrl.length());
          String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
-         String customName = String.format("%s %s", strUserName, fileName);
+         String customName = String.format("%s %s", strUserName.replace(publicDirectoryPrefix, ""), fileName);
 
          try {
              new DownloadImageTask().execute(profilePicUrl, customName, Integer.toString(1));
@@ -426,17 +431,31 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
              // Match profile pic url
              profilePicUrl = "";
-             Pattern p1 = Pattern.compile("<meta +property=\\\"og:image\\\" +content=\\\"(http.+?)\\\"");
-             Matcher matcher1 = p1.matcher(s);
+             Pattern imagePattern = Pattern.compile("<meta +property=\\\"og:image\\\" +content=\\\"(http.+?)\\\"");
+             Matcher imageMatcher = imagePattern.matcher(s);
 
-             if (matcher1.find()) {
-                 profilePicUrl = matcher1.group(1); // First capturing group <3
+             // Handle video
+             Pattern videoPattern = Pattern.compile("<meta +property=\\\"og:video\\\" +content=\\\"(http.+?)\\\"");
+             Matcher videoMatcher = videoPattern.matcher(s);
+
+             if (imageMatcher.find()) {
 
                  //profilePicUrl = "https://instagram.fnic3-1.fna.fbcdn.net/t51.2885-19/s150x150/16464703_427799464234112_4272271048130428928_a.jpg";
                  //String imgUrlFullSize = profilePicUrl.replaceFirst("\\/s.*\\/", "");
 
+                 profilePicUrl = imageMatcher.group(1); // First capturing group <3
+
                  // download and show The image in a ImageView
                  new LoadImageTask((ImageView) findViewById(R.id.imageView1)).execute(profilePicUrl);
+
+                 // New: check for vid + update pic url
+                 if (videoMatcher.find()) {
+                     profilePicUrl = videoMatcher.group(1); // First capturing group <3
+                     btnDownloadProfilePic.setText("Download\nVideo");
+                 }
+                 else {
+                     btnDownloadProfilePic.setText("Download\nPicture");
+                 }
 
                  // Set button visible
                  //btnDownloadProfilePic.setVisibility(View.VISIBLE);
@@ -478,6 +497,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      }
 
      /*************************************************************************/
+
     // Source: https://stackoverflow.com/questions/8654876/http-get-using-android-httpurlconnection
      public class ProcessRestResponseTask extends AsyncTask<String, Void, String> {
 
@@ -626,7 +646,6 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  connection.setDoInput(true);
                  connection.connect();
                  InputStream input = connection.getInputStream();
-                 Bitmap myBitmap = BitmapFactory.decodeStream(input);
 
                  // New 29/09/2017
                  String path = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
@@ -644,10 +663,27 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
                  // Only download if file doesn't exist!
                  if (!pic.exists()) {
-                     FileOutputStream stream = new FileOutputStream(pic);
-                     myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
-                     stream.flush();
-                     stream.close();
+
+                     //if (imgUrlFullSize.endsWith(".mp4")) {
+
+                         FileOutputStream stream = new FileOutputStream(pic);
+                         byte[] buffer = new byte[1024];
+                         int len1;
+                         while ((len1 = input.read(buffer)) != -1) {
+                             stream.write(buffer, 0, len1);
+                         }
+                         stream.close();
+                         input.close();
+                     //}
+                    //else { // JPG
+
+                    //     FileOutputStream stream = new FileOutputStream(pic);
+                    //     Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                    //     myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+                    //     stream.flush();
+                    //     stream.close();
+                    //     input.close();
+                    //}
                  }
 
                  // Return the path so it can be opened within onPostExecute()
@@ -668,7 +704,6 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
              if (s == null) {
                  Toast.makeText(getApplicationContext(), "Image failed to download", Toast.LENGTH_SHORT).show(); // TOAST!
-                 Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > Pic Downloader for Instagram > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
              } else {
                  /*
                  // Doesn't work?

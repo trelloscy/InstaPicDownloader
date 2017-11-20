@@ -50,7 +50,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
                 .skipMemoryCache(true)
                 //.diskCacheStrategy(DiskCacheStrategy.NONE)
-                .diskCacheStrategy(DiskCacheStrategy.ALL) //use this to cache
+                .diskCacheStrategy(DiskCacheStrategy.RESULT) //use this to cache
                 .centerCrop()
                 //.fitCenter()
                 .crossFade()
@@ -195,11 +195,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     File file = new File(galleryList.get(position).getImage_Location());
                     String filePath = "file://" + galleryList.get(position).getImage_Location();
 
+                    // New
+                    String mimeType = (filePath.endsWith(".mp4")) ? "video/*" : "image/*";
+
                     final Intent intent = new Intent(Intent.ACTION_VIEW)
                             .setDataAndType(
                                         Build.VERSION.SDK_INT > Build.VERSION_CODES.M
                                         ? android.support.v4.content.FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file)
-                                        : Uri.parse(filePath), "image/*")
+                                        : Uri.parse(filePath), mimeType)
                             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     context.startActivity(intent);
                 }
