@@ -1,4 +1,4 @@
-package com.mafiaplayer.instapicdownloader;
+package com.mediadownloader.picdownloader;
 
 import android.Manifest;
 import android.content.Intent;
@@ -16,7 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -44,7 +43,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
  public class MainActivity extends AppCompatActivity {
 
-     String appName = "InstaPicDownloader";
+     String appName = "PicDownloader";
      String instagramUrl = "https://www.instagram.com/";
      String publicDirectoryPrefix = "p/";
      EditText txtUsername;
@@ -192,6 +191,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_main);
 
+         //// Display logo in header
+         // getSupportActionBar().setDisplayUseLogoEnabled(true);
+         // getSupportActionBar().setDisplayShowHomeEnabled(true);
+         // getSupportActionBar().setIcon(R.mipmap.ic_launcher);
+
          btnSearch = (Button) findViewById(R.id.btnSearch);
          txtUsername = (EditText) findViewById(R.id.txtUsername);
          btnDownloadProfilePic = (Button) findViewById(R.id.btnDownloadProfilePic);
@@ -272,7 +276,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                      // permission denied, boo! Disable the functionality that depends on this permission.
                      btnDownloadProfilePic.setEnabled(false);
                      btnDownloadImages.setEnabled(false);
-                     Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > Pic Downloader for Instagram > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
+                     Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > Pic Downloader > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
                  }
                  return;
              }

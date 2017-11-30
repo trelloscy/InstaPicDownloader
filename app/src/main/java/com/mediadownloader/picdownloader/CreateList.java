@@ -1,7 +1,4 @@
-package com.mafiaplayer.instapicdownloader;
-
-import android.graphics.BitmapFactory;
-import android.widget.ImageView;
+package com.mediadownloader.picdownloader;
 
 public class CreateList {
 

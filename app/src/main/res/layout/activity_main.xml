@@ -6,7 +6,7 @@
     android:background="#ffffff"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mafiaplayer.instapicdownloader.MainActivity">
+    tools:context="com.mediadownloader.picdownloader.MainActivity">
 
     <Button
         android:id="@+id/btnDownloadImages"

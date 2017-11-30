@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        tools:context="com.mafiaplayer.instapicdownloader.GalleryActivity">
+        tools:context="com.mediadownloader.picdownloader.GalleryActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/imagegallery"

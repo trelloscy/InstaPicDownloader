@@ -1,4 +1,4 @@
-package com.mafiaplayer.instapicdownloader;
+package com.mediadownloader.picdownloader;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -12,8 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.mafiaplayer.instapicdownloader.R;
 
 public class Main2Activity extends AppCompatActivity {
     // Remove the below line after defining your own ad unit ID.

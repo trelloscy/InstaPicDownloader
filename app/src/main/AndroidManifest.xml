@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mafiaplayer.instapicdownloader">
+    package="com.mediadownloader.picdownloader">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
@@ -14,7 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity android:name="com.mediadownloader.picdownloader.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,16 +27,16 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Main2Activity"
+            android:name="com.mediadownloader.picdownloader.Main2Activity"
             android:label="@string/title_activity_main2" /> <!-- Include the AdActivity configChanges and theme. -->
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
         <activity
-            android:name=".Main22Activity"
+            android:name="com.mediadownloader.picdownloader.Main22Activity"
             android:label="@string/title_activity_main22" />
-        <activity android:name=".GalleryActivity"
+        <activity android:name="com.mediadownloader.picdownloader.GalleryActivity"
             android:screenOrientation="portrait"></activity>
 
 
