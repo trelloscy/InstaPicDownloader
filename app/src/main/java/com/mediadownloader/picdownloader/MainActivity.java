@@ -55,13 +55,14 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      Button btnOpenGallery;
      Button btnRandomAccount;
      Button btnShareDownload;
+     ImageView imgPreview;
 
      public void search_Click(View v) {
 
          // Check for empty username
          String userInput = sanitizeUsername();
          if (TextUtils.isEmpty(userInput)) {
-             txtUsername.setError("Please specify a valid Username/Profile url/Share url");
+             txtUsername.setError("Please specify a valid Instagram Username/Profile url/Share url");
              return;
          }
 
@@ -93,6 +94,23 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          }
      }
 
+     public void cancel_Click(View v) {
+         txtUsername.setText("");
+
+         // Disable buttons
+         btnDownloadProfilePic.setEnabled(false);
+         btnDownloadImages.setEnabled(false);
+
+         // Clear imageView
+         clearImage();
+     }
+
+     public void clearImage() {
+
+         imgPreview.setImageResource(android.R.color.transparent);
+         imgPreview.setBackgroundColor(Color.parseColor("#f6f6f6"));
+     }
+
      public String sanitizeUsername() {
          String result = txtUsername.getText().toString().trim();
 
@@ -108,7 +126,12 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
          String strUserName = sanitizeUsername();
          if (TextUtils.isEmpty(strUserName)) {
-             txtUsername.setError("Please specify a valid Username/Profile url/Share url");
+             txtUsername.setError("Please specify a valid Instagram Username/Profile url/Share url");
+
+            // New - disable buttons
+             btnDownloadProfilePic.setEnabled(false);
+             btnDownloadImages.setEnabled(false);
+
              return;
          }
 
@@ -116,9 +139,18 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          //String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
          //String customName = String.format("%s profile pic (%s).jpg", strUserName, date);
 
+         // New - prevent java.lang.StringIndexOutOfBoundsException
+         if (profilePicUrl.length() < 1) {
+             Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_LONG).show(); // TOAST!
+
+             btnDownloadProfilePic.setEnabled(false);
+             btnDownloadImages.setEnabled(false);
+             return;
+         }
+
          // NEW
          String fileName = profilePicUrl.substring(profilePicUrl.lastIndexOf('/')+1, profilePicUrl.length());
-         String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+         //String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
          String customName = String.format("%s %s", strUserName.replace(publicDirectoryPrefix, ""), fileName);
 
          try {
@@ -134,6 +166,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          String strUserName = sanitizeUsername();
          if (TextUtils.isEmpty(strUserName)) {
              txtUsername.setError("Please specify a valid username or Profile url");
+
+             // New - disable buttons
+             btnDownloadProfilePic.setEnabled(false);
+             btnDownloadImages.setEnabled(false);
+
              return;
          }
 
@@ -151,7 +188,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              // e.g.: https://scontent-ams3-1.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/c135.0.810.810/21980629_914563065361670_1351262531695411200_n.jpg
 
              String fileName = url.substring(url.lastIndexOf('/')+1, url.length());
-             String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+             //String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
              String customName = String.format("%s %s", strUserName, fileName);
 
              try {
@@ -201,6 +238,8 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          btnDownloadProfilePic = (Button) findViewById(R.id.btnDownloadProfilePic);
          btnDownloadImages = (Button) findViewById(R.id.btnDownloadImages);
          btnRandomAccount = (Button) findViewById(R.id.btnRandomAccount);
+         imgPreview = (ImageView) findViewById(R.id.imgPreview);
+         clearImage();
 
          // TEMP - set default value
          //txtUsername.setText("themos.k");
@@ -450,7 +489,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  profilePicUrl = imageMatcher.group(1); // First capturing group <3
 
                  // download and show The image in a ImageView
-                 new LoadImageTask((ImageView) findViewById(R.id.imageView1)).execute(profilePicUrl);
+                 new LoadImageTask(imgPreview).execute(profilePicUrl);
 
                  // New: check for vid + update pic url
                  if (videoMatcher.find()) {
@@ -640,7 +679,8 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              String filePath;
 
              // Moved here to make it more reusable
-             String imgUrlFullSize = params[0].replaceFirst("\\/s[0-9]+.*\\/", "/");
+             //String imgUrlFullSize = params[0].replaceFirst("\\/s[0-9]+.*\\/", "/"); // Old code
+             String imgUrlFullSize = params[0].replaceFirst("vp+.*\\/", "vp/"); // New code
              String fileName = params[1];
              String index  = params[2];
 
