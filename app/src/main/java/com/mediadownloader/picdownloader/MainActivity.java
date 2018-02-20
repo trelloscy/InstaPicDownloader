@@ -56,6 +56,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      Button btnRandomAccount;
      Button btnShareDownload;
      ImageView imgPreview;
+     ProgressDialog dialog;
 
      public void search_Click(View v) {
 
@@ -154,6 +155,10 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          String customName = String.format("%s %s", strUserName.replace(publicDirectoryPrefix, ""), fileName);
 
          try {
+
+             // New - show dialog in main thread
+             dialog.setMessage("Downloading...");
+             dialog.show();
              new DownloadImageTask().execute(profilePicUrl, customName, Integer.toString(1));
 
          } catch (Exception e) {
@@ -181,6 +186,10 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
           */
 
          int counter = picturesUrlList.size();
+
+         // New - show dialog in main thread
+         dialog.setMessage("Downloading latest images...");
+         dialog.show();
 
          for (String url: picturesUrlList) {
 
@@ -239,6 +248,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          btnDownloadImages = (Button) findViewById(R.id.btnDownloadImages);
          btnRandomAccount = (Button) findViewById(R.id.btnRandomAccount);
          imgPreview = (ImageView) findViewById(R.id.imgPreview);
+         dialog = new ProgressDialog(this);
          clearImage();
 
          // TEMP - set default value
@@ -504,12 +514,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  //btnDownloadProfilePic.setVisibility(View.VISIBLE);
                  //btnDownloadImages.setVisibility(View.VISIBLE);
                  btnDownloadProfilePic.setEnabled(true);
-                 btnDownloadImages.setEnabled(true);
 
                  // NEW!!!
 
-                 // Match x12 images
-                 Pattern p2 = Pattern.compile("\"thumbnail_src\": \"(https:.+?)\"");
+                 // Match x24 images
+                 Pattern p2 = Pattern.compile("\"thumbnail_src\":?\"(https:.+?)\"");
                  Matcher matcher2 = p2.matcher(s);
 
                  // Clear pictures array
@@ -663,14 +672,8 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
      public class DownloadImageTask extends AsyncTask<String, Void, String> {
 
-         ProgressDialog asyncDialog = new ProgressDialog(MainActivity.this);
-
          @Override
          protected void onPreExecute() {
-             // Set message of the dialog
-             asyncDialog.setMessage("Downloading...");
-             // Show dialog
-             asyncDialog.show();
          }
 
          @Override
@@ -743,11 +746,9 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          @Override
          protected void onPostExecute(String s) {
 
-             // Hide the dialog
-             asyncDialog.dismiss();
-
              if (s == null) {
                  Toast.makeText(getApplicationContext(), "Image failed to download", Toast.LENGTH_SHORT).show(); // TOAST!
+                 dialog.dismiss();
              } else {
                  /*
                  // Doesn't work?
@@ -759,6 +760,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
                  // Index will be 1 if profile pic, or when the LAST image in the array has been downloaded
                  if (index.equals("1")) {
+                     dialog.dismiss();
                      Toast.makeText(getApplicationContext(), "Download completed successfully", Toast.LENGTH_SHORT).show(); // TOAST!
                      btnOpenGallery.performClick();
                  }
