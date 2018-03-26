@@ -683,7 +683,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
              // Moved here to make it more reusable
              //String imgUrlFullSize = params[0].replaceFirst("\\/s[0-9]+.*\\/", "/"); // Old code
-             String imgUrlFullSize = params[0].replaceFirst("vp+.*\\/", "vp/"); // New code
+             String imgUrlFullSize = params[0];//.replaceFirst("vp+.*\\/", "vp/"); // New code
              String fileName = params[1];
              String index  = params[2];
 
@@ -748,6 +748,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
              if (s == null) {
                  Toast.makeText(getApplicationContext(), "Image failed to download", Toast.LENGTH_SHORT).show(); // TOAST!
+                 Toast.makeText(getApplicationContext(), "Our development team has been notified of the issue, we will try to resolve it as soon as possible", Toast.LENGTH_LONG).show(); // TOAST!
                  dialog.dismiss();
              } else {
                  /*
