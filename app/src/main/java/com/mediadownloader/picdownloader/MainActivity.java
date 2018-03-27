@@ -82,7 +82,6 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              Log.d("Error", e.getMessage());
          }
 
-
          // New
          if (!userInput.startsWith(publicDirectoryPrefix)) {
              // Problem: This includes INVALID searches
@@ -491,6 +490,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              Pattern videoPattern = Pattern.compile("<meta +property=\\\"og:video\\\" +content=\\\"(http.+?)\\\"");
              Matcher videoMatcher = videoPattern.matcher(s);
 
+             // New - Handle hd profile pic (320x320) :-(
+             Pattern hdProfilePattern = Pattern.compile("\\\"profile_pic_url_hd\\\":\\\"(https.+?)\\\"");
+             Matcher hdProfileMatcher = hdProfilePattern.matcher(s);
+
+             // Image matcher will match both Image and Video!
              if (imageMatcher.find()) {
 
                  //profilePicUrl = "https://instagram.fnic3-1.fna.fbcdn.net/t51.2885-19/s150x150/16464703_427799464234112_4272271048130428928_a.jpg";
@@ -508,6 +512,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  }
                  else {
                      btnDownloadProfilePic.setText("Download\nPicture");
+
+                     // New - check for hd profile match, and update pic url
+                     if (hdProfileMatcher.find()) {
+                         profilePicUrl = hdProfileMatcher.group(1); // First capturing group <3
+                     }
                  }
 
                  // Set button visible
@@ -749,6 +758,15 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              if (s == null) {
                  Toast.makeText(getApplicationContext(), "Image failed to download", Toast.LENGTH_SHORT).show(); // TOAST!
                  Toast.makeText(getApplicationContext(), "Our development team has been notified of the issue, we will try to resolve it as soon as possible", Toast.LENGTH_LONG).show(); // TOAST!
+
+                 // Not sure if I want to also log the user input?
+                 String errorUrl = "http://centraldbwebapi.azurewebsites.net/api/error/";// + userInput;
+                 try {
+                     new ProcessMetadataTask().execute(errorUrl);
+                 } catch (Exception e) {
+                     Log.d("Error", e.getMessage());
+                 }
+
                  dialog.dismiss();
              } else {
                  /*
