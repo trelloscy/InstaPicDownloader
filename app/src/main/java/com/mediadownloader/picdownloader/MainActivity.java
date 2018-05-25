@@ -154,7 +154,10 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          // NEW
          String fileName = profilePicUrl.substring(profilePicUrl.lastIndexOf('/')+1, profilePicUrl.length());
          //String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
-         String customName = String.format("%s %s", strUserName.replace(publicDirectoryPrefix, ""), fileName);
+
+         // New - Split username on "/" and get the first part
+         String prefixName = (strUserName.replace(publicDirectoryPrefix, "") + "/").split("/")[0];
+         String customName = String.format("%s %s", prefixName, fileName);
 
          try {
 
