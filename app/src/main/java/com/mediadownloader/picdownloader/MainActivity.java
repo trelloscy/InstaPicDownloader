@@ -114,6 +114,9 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      public String sanitizeUsername() {
          String result = txtUsername.getText().toString().trim();
 
+         // New - remove blank spaces
+         result = result.replace(" ", "");
+
          result = result.replace(instagramUrl, "");
          if (result.endsWith("/")) {
              result = result.substring(0, result.lastIndexOf('/'));
