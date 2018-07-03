@@ -20,7 +20,7 @@
         android:drawablePadding="8dp"
         style="?android:attr/borderlessButtonStyle"
 
-        android:onClick="downloadImages_Click"
+        android:onClick="downloadLatest_Click"
         android:text="Download\nLatest"
         android:visibility="visible"
         android:enabled="false"
@@ -105,7 +105,7 @@
         android:gravity="left|center"
         style="?android:attr/borderlessButtonStyle"
 
-        android:onClick="downloadProfilePic_Click"
+        android:onClick="downloadPictures_Click"
         android:text="Download\nPicture"
         android:visibility="visible"
         android:enabled="false"

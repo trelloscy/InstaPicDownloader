@@ -47,11 +47,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
      String instagramUrl = "https://www.instagram.com/";
      String publicDirectoryPrefix = "p/";
      EditText txtUsername;
-     String profilePicUrl = "";
-     ArrayList<String> picturesUrlList = new ArrayList<>();
+     ArrayList<String> picturesList = new ArrayList<>();
+     ArrayList<String> latestPicturesList = new ArrayList<>();
      Button btnSearch;
-     Button btnDownloadProfilePic;
-     Button btnDownloadImages;
+     Button btnDownloadPictures;
+     Button btnDownloadLatest;
      Button btnOpenGallery;
      Button btnRandomAccount;
      Button btnShareDownload;
@@ -66,6 +66,9 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              txtUsername.setError("Please specify a valid Instagram Username/Profile url/Share url");
              return;
          }
+
+         // Clear preview pic
+         clearImage();
 
          //Toast.makeText(getApplicationContext(), "Button clicked!", Toast.LENGTH_SHORT).show();
 
@@ -98,8 +101,8 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          txtUsername.setText("");
 
          // Disable buttons
-         btnDownloadProfilePic.setEnabled(false);
-         btnDownloadImages.setEnabled(false);
+         btnDownloadPictures.setEnabled(false);
+         btnDownloadLatest.setEnabled(false);
 
          // Clear imageView
          clearImage();
@@ -125,61 +128,25 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          return result;
      }
 
-     public void downloadProfilePic_Click(View v) {
+     public void downloadPictures_Click(View v) {
 
-         String strUserName = sanitizeUsername();
-         if (TextUtils.isEmpty(strUserName)) {
-             txtUsername.setError("Please specify a valid Instagram Username/Profile url/Share url");
-
-            // New - disable buttons
-             btnDownloadProfilePic.setEnabled(false);
-             btnDownloadImages.setEnabled(false);
-
-             return;
-         }
-
-         // OLD
-         //String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-         //String customName = String.format("%s profile pic (%s).jpg", strUserName, date);
-
-         // New - prevent java.lang.StringIndexOutOfBoundsException
-         if (profilePicUrl.length() < 1) {
-             Toast.makeText(getApplicationContext(), "Something went wrong, please try again", Toast.LENGTH_LONG).show(); // TOAST!
-
-             btnDownloadProfilePic.setEnabled(false);
-             btnDownloadImages.setEnabled(false);
-             return;
-         }
-
-         // NEW
-         String fileName = profilePicUrl.substring(profilePicUrl.lastIndexOf('/')+1, profilePicUrl.length());
-         //String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
-
-         // New - Split username on "/" and get the first part
-         String prefixName = (strUserName.replace(publicDirectoryPrefix, "") + "/").split("/")[0];
-         String customName = String.format("%s %s", prefixName, fileName);
-
-         try {
-
-             // New - show dialog in main thread
-             dialog.setMessage("Downloading...");
-             dialog.show();
-             new DownloadImageTask().execute(profilePicUrl, customName, Integer.toString(1));
-
-         } catch (Exception e) {
-             Log.d("Error", e.getMessage());
-         }
+         downloadUrls(picturesList);
      }
 
-     public void downloadImages_Click(View v) {
+     public void downloadLatest_Click(View v) {
+
+         downloadUrls(latestPicturesList);
+     }
+
+     public void downloadUrls(ArrayList<String> urlList) {
 
          String strUserName = sanitizeUsername();
          if (TextUtils.isEmpty(strUserName)) {
              txtUsername.setError("Please specify a valid username or Profile url");
 
              // New - disable buttons
-             btnDownloadProfilePic.setEnabled(false);
-             btnDownloadImages.setEnabled(false);
+             btnDownloadPictures.setEnabled(false);
+             btnDownloadLatest.setEnabled(false);
 
              return;
          }
@@ -190,20 +157,30 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
           * Could also display the number of pics in the Gallery!
           */
 
-         int counter = picturesUrlList.size();
+         int counter = urlList.size();
 
          // New - show dialog in main thread
-         dialog.setMessage("Downloading latest images...");
+         dialog.setMessage("Processing request...");
          dialog.show();
 
-         for (String url: picturesUrlList) {
+         for (String url: urlList) {
 
              // String "url" is the url of each pic
              // e.g.: https://scontent-ams3-1.cdninstagram.com/t51.2885-15/s640x640/sh0.08/e35/c135.0.810.810/21980629_914563065361670_1351262531695411200_n.jpg
 
              String fileName = url.substring(url.lastIndexOf('/')+1, url.length());
+             // Filename is now: 35616615_239897606809896_7540444270772092928_n.jpg?efg=eyJ1cmxnZW4iOiJ1cmxnZW5fZnJvbV9pZyJ9
+
+             // New 03/07/2018
+             if (fileName.contains("?")) {
+                 fileName = fileName.substring(0, fileName.indexOf("?"));
+             }
+
              //String fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
-             String customName = String.format("%s %s", strUserName, fileName);
+
+             // OLD WAY
+             //String customName = String.format("%s %s", strUserName, fileName);
+             String customName = String.format("%s", fileName);
 
              try {
                  new DownloadImageTask().execute(url, customName, Integer.toString(counter--));
@@ -249,8 +226,8 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
          btnSearch = (Button) findViewById(R.id.btnSearch);
          txtUsername = (EditText) findViewById(R.id.txtUsername);
-         btnDownloadProfilePic = (Button) findViewById(R.id.btnDownloadProfilePic);
-         btnDownloadImages = (Button) findViewById(R.id.btnDownloadImages);
+         btnDownloadPictures = (Button) findViewById(R.id.btnDownloadProfilePic);
+         btnDownloadLatest = (Button) findViewById(R.id.btnDownloadImages);
          btnRandomAccount = (Button) findViewById(R.id.btnRandomAccount);
          imgPreview = (ImageView) findViewById(R.id.imgPreview);
          dialog = new ProgressDialog(this);
@@ -260,7 +237,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          //txtUsername.setText("themos.k");
 
          // TEMP - Set button visible
-         //btnDownloadProfilePic.setVisibility(View.VISIBLE);
+         //btnDownloadPictures.setVisibility(View.VISIBLE);
 
          // Load an ad into the AdMob banner view.
          AdView adView = (AdView) findViewById(R.id.adView);
@@ -322,14 +299,14 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                      // permission was granted, yay! Do the storage-related task you need to do.
-                     btnDownloadProfilePic.setEnabled(true);
-                     btnDownloadImages.setEnabled(true);
+                     btnDownloadPictures.setEnabled(true);
+                     btnDownloadLatest.setEnabled(true);
 
                  } else {
 
                      // permission denied, boo! Disable the functionality that depends on this permission.
-                     btnDownloadProfilePic.setEnabled(false);
-                     btnDownloadImages.setEnabled(false);
+                     btnDownloadPictures.setEnabled(false);
+                     btnDownloadLatest.setEnabled(false);
                      Toast.makeText(getApplicationContext(), "Please enable 'STORAGE' permission in Settings > Apps > Pic Downloader > Permissions", Toast.LENGTH_LONG).show(); // TOAST!
                  }
                  return;
@@ -487,78 +464,89 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              // Source code retrieval successful
              // Proceed with pattern matching
 
-             // Match profile pic url
-             profilePicUrl = "";
-             Pattern imagePattern = Pattern.compile("<meta +property=\\\"og:image\\\" +content=\\\"(http.+?)\\\"");
-             Matcher imageMatcher = imagePattern.matcher(s);
-
-             // Handle video
-             Pattern videoPattern = Pattern.compile("<meta +property=\\\"og:video\\\" +content=\\\"(http.+?)\\\"");
-             Matcher videoMatcher = videoPattern.matcher(s);
+             // New - Clear both arrays here
+             picturesList.clear();
+             latestPicturesList.clear();
+             btnDownloadPictures.setEnabled(false);
+             btnDownloadLatest.setEnabled(false);
 
              // New - Handle hd profile pic (320x320) :-(
-             Pattern hdProfilePattern = Pattern.compile("\\\"profile_pic_url_hd\\\":\\\"(https.+?)\\\"");
+             Pattern hdProfilePattern = Pattern.compile("\"profile_pic_url_hd\":\"(https:.+?)\"");
              Matcher hdProfileMatcher = hdProfilePattern.matcher(s);
 
-             // Image matcher will match both Image and Video!
-             if (imageMatcher.find()) {
+             // New - Check if a profile or post has been specified
+             if (hdProfileMatcher.find()) {
 
-                 //profilePicUrl = "https://instagram.fnic3-1.fna.fbcdn.net/t51.2885-19/s150x150/16464703_427799464234112_4272271048130428928_a.jpg";
-                 //String imgUrlFullSize = profilePicUrl.replaceFirst("\\/s.*\\/", "");
+                 picturesList.add(hdProfileMatcher.group(1)); // First capturing group <3
 
-                 profilePicUrl = imageMatcher.group(1); // First capturing group <3
+                 if (!picturesList.isEmpty()) {
+                     // Download and show The image in a ImageView
+                     new LoadImageTask(imgPreview).execute(picturesList.get(0));
 
-                 // download and show The image in a ImageView
-                 new LoadImageTask(imgPreview).execute(profilePicUrl);
+                     // Reset button text
+                     btnDownloadPictures.setText("Download\nPicture");
 
-                 // New: check for vid + update pic url
-                 if (videoMatcher.find()) {
-                     profilePicUrl = videoMatcher.group(1); // First capturing group <3
-                     btnDownloadProfilePic.setText("Download\nVideo");
+                     // Set button visible
+                     //btnDownloadPictures.setVisibility(View.VISIBLE);
+                     //btnDownloadLatest.setVisibility(View.VISIBLE);
+                     btnDownloadPictures.setEnabled(true);
                  }
-                 else {
-                     btnDownloadProfilePic.setText("Download\nPicture");
-
-                     // New - check for hd profile match, and update pic url
-                     if (hdProfileMatcher.find()) {
-                         profilePicUrl = hdProfileMatcher.group(1); // First capturing group <3
-                     }
-                 }
-
-                 // Set button visible
-                 //btnDownloadProfilePic.setVisibility(View.VISIBLE);
-                 //btnDownloadImages.setVisibility(View.VISIBLE);
-                 btnDownloadProfilePic.setEnabled(true);
 
                  // NEW!!!
 
-                 // Match x24 images
-                 Pattern p2 = Pattern.compile("\"thumbnail_src\":?\"(https:.+?)\"");
-                 Matcher matcher2 = p2.matcher(s);
-
-                 // Clear pictures array
-                 picturesUrlList.clear();
+                 // Match x12 images
+                 Pattern latestPicturesPattern = Pattern.compile("\"thumbnail_src\":\"(https:.+?)\"");
+                 Matcher latestPicturesMatcher = latestPicturesPattern.matcher(s);
 
                  // Add urls to array
-                 while (matcher2.find()) {
-                     picturesUrlList.add(matcher2.group(1));
+                 while (latestPicturesMatcher.find()) {
+                     latestPicturesList.add(latestPicturesMatcher.group(1));
                  }
 
-                 if (picturesUrlList.isEmpty()) {
-                     btnDownloadImages.setEnabled(false);
-                 }
-                 else {
-                     btnDownloadImages.setEnabled(true);
+                 // If list is still empty, proceed as usual
+                 if (!latestPicturesList.isEmpty()) {
+                     btnDownloadLatest.setEnabled(true);
                  }
 
-             } else {
+             } else { // No hdProfile matched
+
+                 // New - If link is a post, search for images+videos and combine the results
+                 Pattern picturesPattern = Pattern.compile("\"display_url\":\"(https:.+?)\"");
+                 Matcher picturesMatcher = picturesPattern.matcher(s);
+
+                 // Add picture urls to array
+                 while (picturesMatcher.find()) {
+                     picturesList.add(picturesMatcher.group(1));
+                 }
+
+                 Pattern videosPattern = Pattern.compile("\"video_url\":\"(https:.+?)\"");
+                 Matcher videosMatcher = videosPattern.matcher(s);
+
+                 // Add picture urls to array
+                 while (videosMatcher.find()) {
+                     picturesList.add(videosMatcher.group(1));
+                 }
+
+                 if (!picturesList.isEmpty()) {
+                     // Download and show The image in a ImageView
+                     new LoadImageTask(imgPreview).execute(picturesList.get(0));
+
+                     // Make sure the button is enabled
+                     btnDownloadPictures.setEnabled(true);
+
+                     // Reset button text
+                     if (picturesList.size() > 1) {
+                         btnDownloadPictures.setText("Download\nPosts");
+                     }
+                     else {
+                         btnDownloadPictures.setText("Download\nPost");
+                     }
+                 }
+             }
+
+             // New - if both arrays are empty, show toast notification
+             if (picturesList.isEmpty() && latestPicturesList.isEmpty()) {
                  Toast.makeText(getApplicationContext(), "Pattern matching failed", Toast.LENGTH_LONG).show(); // TOAST!
-
-                 // Maybe: clear pic?
-
-                 // Set buttons HIDDEN - not sure about this?
-                 btnDownloadProfilePic.setEnabled(false);
-                 btnDownloadImages.setEnabled(false);
              }
          }
      }
