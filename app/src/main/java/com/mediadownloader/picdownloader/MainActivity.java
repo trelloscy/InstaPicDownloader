@@ -45,6 +45,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
      String appName = "PicDownloader";
      String instagramUrl = "https://www.instagram.com/";
+     String instagramUrlShort = "https://instagram.com/";
      String publicDirectoryPrefix = "p/";
      EditText txtUsername;
      ArrayList<String> picturesList = new ArrayList<>();
@@ -120,7 +121,13 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
          // New - remove blank spaces
          result = result.replace(" ", "");
 
+         // New
+         if (result.contains("?")) {
+             result = result.substring(0, result.indexOf("?"));
+         }
+
          result = result.replace(instagramUrl, "");
+         result = result.replace(instagramUrlShort, "");
          if (result.endsWith("/")) {
              result = result.substring(0, result.lastIndexOf('/'));
          }
@@ -495,7 +502,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  // NEW!!!
 
                  // Match x12 images
-                 Pattern latestPicturesPattern = Pattern.compile("\"thumbnail_src\":\"(https:.+?)\"");
+                 Pattern latestPicturesPattern = Pattern.compile("\"display_url\":\"(https:.+?)\"");
                  Matcher latestPicturesMatcher = latestPicturesPattern.matcher(s);
 
                  // Add urls to array

@@ -39,7 +39,9 @@
         <activity android:name="com.mediadownloader.picdownloader.GalleryActivity"
             android:screenOrientation="portrait"></activity>
 
-
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7370185921410390~7759949104"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
