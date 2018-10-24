@@ -299,8 +299,8 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                      // permission was granted, yay! Do the storage-related task you need to do.
-                     btnDownloadPictures.setEnabled(true);
-                     btnDownloadLatest.setEnabled(true);
+                     //btnDownloadPictures.setEnabled(true);
+                     //btnDownloadLatest.setEnabled(true);
 
                  } else {
 

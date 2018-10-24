@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,19 +41,24 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         File f = new File(galleryList.get(i).getImage_Location());
 
+        // New 10/09/2018
+        RequestOptions myOptions = new RequestOptions()
+                .fitCenter()
+                .centerCrop()
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(140, 140);
+
         Glide
                 .with(context)
                 .load(Uri.fromFile(f))
-                .override(140, 140)
+                .apply(myOptions)
 
-                //.thumbnail(0.5f)
-
-                .skipMemoryCache(true)
-                //.diskCacheStrategy(DiskCacheStrategy.NONE)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT) //use this to cache
-                .centerCrop()
+                //.skipMemoryCache(true)
+                //.diskCacheStrategy(DiskCacheStrategy.RESULT) //use this to cache
+                //.centerCrop()
                 //.fitCenter()
-                .crossFade()
+                //.crossFade()
                 //.placeholder(R.drawable.placeholder)
                 //.error(R.drawable.imagenotfound)
                 .into(viewHolder.img);
