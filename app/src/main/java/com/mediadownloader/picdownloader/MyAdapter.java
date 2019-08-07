@@ -45,7 +45,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         RequestOptions myOptions = new RequestOptions()
                 .fitCenter()
                 .centerCrop()
-                .skipMemoryCache(true)
+                .skipMemoryCache(false)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .override(140, 140);
 
