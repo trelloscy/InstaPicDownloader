@@ -484,7 +484,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
              // New - Check if a profile or post has been specified
              if (hdProfileMatcher.find()) {
 
-                 picturesList.add(hdProfileMatcher.group(1)); // First capturing group <3
+                 picturesList.add(SanitizeURL(hdProfileMatcher.group(1))); // First capturing group <3
 
                  if (!picturesList.isEmpty()) {
                      // Download and show The image in a ImageView
@@ -507,7 +507,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
                  // Add urls to array
                  while (latestPicturesMatcher.find()) {
-                     latestPicturesList.add(latestPicturesMatcher.group(1));
+                     latestPicturesList.add(SanitizeURL(latestPicturesMatcher.group(1)));
                  }
 
                  // If list is still empty, proceed as usual
@@ -523,7 +523,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
                  // Add picture urls to array
                  while (picturesMatcher.find()) {
-                     picturesList.add(picturesMatcher.group(1));
+                     picturesList.add(SanitizeURL(picturesMatcher.group(1)));
                  }
 
                  Pattern videosPattern = Pattern.compile("\"video_url\":\"(https:.+?)\"");
@@ -531,7 +531,7 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
 
                  // Add picture urls to array
                  while (videosMatcher.find()) {
-                     picturesList.add(videosMatcher.group(1));
+                     picturesList.add(SanitizeURL(videosMatcher.group(1)));
                  }
 
                  if (!picturesList.isEmpty()) {
@@ -556,6 +556,11 @@ import static android.os.Environment.getExternalStoragePublicDirectory;
                  Toast.makeText(getApplicationContext(), "Pattern matching failed", Toast.LENGTH_LONG).show(); // TOAST!
              }
          }
+     }
+
+     public String SanitizeURL(String url) {
+         String match = url.replace("\\u0026", "&");
+         return match;
      }
 
      /*************************************************************************/
