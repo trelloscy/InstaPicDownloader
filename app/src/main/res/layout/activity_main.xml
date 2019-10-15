@@ -30,34 +30,13 @@
         app:layout_constraintTop_toBottomOf="@+id/imgPreview" />
 
     <Button
-        android:id="@+id/btnSearch"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="42dp"
-        android:layout_height="38dp"
-
-        android:layout_marginTop="84dp"
-        android:layout_marginLeft="1dp"
-        android:layout_weight="1"
-
-        android:background="@drawable/button"
-        android:drawableLeft="@drawable/search"
-        android:drawablePadding="5dp"
-        android:gravity="left|center"
-        android:onClick="search_Click"
-        android:text=""
-        app:layout_constraintStart_toEndOf="@+id/txtUsername"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/btnCancel"
         style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="38dp"
 
-        android:layout_marginTop="84dp"
-        android:layout_marginLeft="0dp"
+        android:layout_marginTop="88dp"
         android:layout_weight="1"
-
         android:background="@drawable/button"
         android:drawableLeft="@drawable/cancel"
         android:drawablePadding="5dp"
@@ -67,12 +46,31 @@
         app:layout_constraintStart_toEndOf="@+id/btnSearch"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/btnSearch"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="42dp"
+        android:layout_height="38dp"
+
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="88dp"
+
+        android:layout_weight="1"
+        android:background="@drawable/button"
+        android:drawableLeft="@drawable/search"
+        android:drawablePadding="5dp"
+        android:gravity="left|center"
+        android:onClick="search_Click"
+        android:text=""
+        app:layout_constraintStart_toEndOf="@+id/txtUsername"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/txtUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="42dp"
+        android:layout_width="229dp"
+        android:layout_height="0dp"
         android:layout_marginLeft="30dp"
-        android:layout_marginStart="30dp"
 
         android:layout_marginTop="82dp"
         android:backgroundTint="@color/colorAccent"
